@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Wikipedia Viewer</title>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function() {
+            $('#search-btn').on('click', function() {
+                var searchString = $('#search-string').val();
+                if (searchString) {
+                    search(searchString);
+                }
+            });
+
+            $('#clear').on('click', function() {
+                $('#search-string').val('');
+                $('#result').empty();
+            });
+        });
+
+        function search(searchString) {
+            // Use Ajax to handle things
+            $.ajax({
+                url: 'https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srsearch=' + searchString,
+                dataType: 'jsonp',
+                type: 'POST',
+                headers: {
+                    'Api-User-Agent': 'Example/1.0'
+                },
+                success: function(data) {
+                    var $result = $('#result');
+                    $result.empty();
+                    var resArr = data.query.search;
+                    var keys = Object.keys(resArr);
+
+                    keys.forEach(function(key) {
+                        var listItem = '<li><a href="https://en.wikipedia.org/wiki/' + resArr[key].title + '" target="_blank"><h3>' + resArr[key].title + '</h3><p>' + resArr[key].snippet + '</p></a></li>';
+                        $result.append(listItem);
+                    });
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Wikipedia Viewer</h1>
+    <div>
+        <a href="https://en.wikipedia.org/wiki/Special:Random" target="_blank">Click here for random article</a>
+    </div>
+    <hr/>
+    <div>
+        <input type="text" id="search-string">
+        <button id="search-btn">Search</button>
+        <button id="clear">Clear</button>
+    </div>
+    <ul id="result">
+    </ul>
+</body>
+</html>
